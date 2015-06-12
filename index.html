@@ -25,8 +25,9 @@
 	var mySpriteSheetImage  = PIXI.BaseTexture.fromImage("tileset.png");
 
 	var spriteTexture = new Array();
-	var fastGrass = new PIXI.ParticleContainer(1000000,{});
+	var fastGrass = new PIXI.ParticleContainer(1000000,{uvs: true});
 	fastGrass.roundPixelsboolean = true;
+	stage2.roundPixelsboolean = true;
 	//fastGrass.properties.scale = true;
 	
 	for(var x =0;x<30;x++){	
@@ -41,35 +42,36 @@
 
 	var spriteMap = new Array();
 	
-	for(var x =0;x<32;x++){	
+	for(var x =0;x<200;x++){	
 		spriteMap[x] = new Array();
-		for(var y =0;y<32;y++){
-			spriteMap[x][y] = new PIXI.Sprite(spriteTexture[~~(3*Math.random())][~~(2*Math.random())]);
-			spriteMap[x][y].position.x = 7.99*x;
-			spriteMap[x][y].position.y = 7.99*y;
+		for(var y =0;y<110;y++){
+			spriteMap[x][y] = new PIXI.Sprite(spriteTexture[(x+y)%20][0]);
+			//spriteMap[x][y].tint = 0x00FF00;
+			spriteMap[x][y].position.x = 7.9999*x;
+			spriteMap[x][y].position.y = 7.9999*y;
 
 			fastGrass.addChild(spriteMap[x][y]);
 		}
 	}
 
 	//stage.addChild(fastGrass);
-	stage2.scale.x = 4;
-	stage2.scale.y = 4;
-	for(var x =0;x<32;x++)
-		for(var y =0;y<32;y++){
-			spriteMap[x][y].texture = spriteTexture[(x)%30][0];
+	stage2.scale.x = 2;
+	stage2.scale.y = 2;
+	for(var x =0;x<20;x++)
+		for(var y =0;y<20;y++){
+			spriteMap[x][y].texture = spriteTexture[(x+y)%20][0];
 		}
 	var renderTexture = new Array();
 	for(var i =0;i<9;i++)
-		renderTexture[i] = new PIXI.RenderTexture(renderer,256, 256);
+		renderTexture[i] = new PIXI.RenderTexture(renderer,600, 600);
 
 	var checker = new Array();
 	for(var x =0;x<3;x++)
 			for(var y =0;y<3;y++){
 				var i = x+y*3
 		checker[i] = new PIXI.Sprite(renderTexture[i]);
-		checker[i].position.x = (x)*256;
-		checker[i].position.y = (y)*256;
+		checker[i].position.x = (x)*600;
+		checker[i].position.y = (y)*600;
 		checker[i].scale.x = 1;
 		checker[i].scale.y = 1;
 		stage2.addChild(checker[i]);
@@ -82,25 +84,34 @@
 	var t = 0;
 	function draw() {
 		
-		for(var i =0;i<9;i++){
-			if((t+i)%2==0)
-			for(var x =0;x<32;x++)
-			for(var y =0;y<32;y++){
-				var temp = spriteMap[x][y].position.x ;
-				spriteMap[x][y].position.x = spriteMap[x][y].position.y;
-				spriteMap[x][y].position.y = temp;
-			}
-			renderTexture[i].render(fastGrass, null, false);
-		}
+		//for(var i =0;i<9;i++){
+			if((t%30)/10%2!=0){
+				for(var x =0;x<200;x++)
+					for(var y =0;y<110;y++){
+						//var temp = spriteMap[x][y].position.x ;
+						spriteMap[x][y].texture = spriteTexture[(t+x+y)%30][~~(Math.random()*2)];
+						//spriteMap[x][y].position.y = temp;
+					}
+				} else {
+					for(var x =0;x<200;x++)
+						for(var y =0;y<110;y++){
+							//var temp = spriteMap[x][y].position.x ;
+							spriteMap[x][y].texture = spriteTexture[~~(Math.random()*20)][~~(Math.random()*20)];
+							//spriteMap[x][y].position.y = temp;
+						}
+				}
+			
+			//renderTexture[i].render(fastGrass, null, false);
+		//}
 		t++;
 		//if(t++%14==0){
 		
 			//checker.texture = spriteTexture[~~(30*Math.random())][~~(30*Math.random())];
 		//}
-		stage2.scale.x = (4+3*Math.sin(t/100.0));
-		stage2.scale.y = (4+3*Math.sin(t/100.0));
+		fastGrass.scale.x = (5+4*Math.cos(t/30.0));
+		fastGrass.scale.y = (5+4*Math.cos(t/30.0));
 		//for(var i =0;i<9;i++)
-			renderer.render(stage2);
+		renderer.render(fastGrass);
 		requestAnimationFrame(draw);
 	}
 
